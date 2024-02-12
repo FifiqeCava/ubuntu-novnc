@@ -8,7 +8,7 @@ RUN apt-get update
 RUN apt-get install -y xfce4 xfce4-terminal
 RUN apt-get install -y novnc
 RUN apt-get install -y tightvncserver websockify
-RUN apt-get install -y wget net-tools wget curl chromium-browser firefox openssh-client git
+RUN apt-get install -y wget net-tools wget curl chromium-browser firefox openssh-client git wine
 ENV USER root
 
 COPY start.sh /start.sh
@@ -26,7 +26,7 @@ RUN chown -R user:user /home/user
 #RUN apt-get -y install gvfs-bin
 #RUN dpkg -i atom-amd64.deb
 RUN apt-get -y install gedit vim
-USER user
+USER root
 
 WORKDIR /.novnc
 RUN wget -qO- https://github.com/novnc/noVNC/archive/v1.0.0.tar.gz | tar xz --strip 1 -C $PWD
