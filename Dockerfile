@@ -2,14 +2,15 @@ FROM ubuntu:18.04
 MAINTAINER uli.hitzel@gmail.com
 EXPOSE 8080 5901
 ARG DEBIAN_FRONTEND=noninteractive
-ENV TZ=Asia/Singapore
+ENV TZ=Europe/Singapore
 
 RUN apt-get update
 RUN apt-get install -y xfce4 xfce4-terminal
 RUN apt-get install -y novnc
 RUN apt-get install -y tightvncserver websockify
-RUN apt-get install -y wget net-tools wget curl chromium-browser firefox openssh-client git wine
+RUN apt-get install -y wget net-tools wget curl chromium-browser firefox openssh-client git
 ENV USER root
+#RUN printf "axway99\naxway99\n\n" | vncserver :1
 
 COPY start.sh /start.sh
 RUN chmod a+x /start.sh
@@ -20,12 +21,6 @@ RUN chown user:user /.novnc
 
 COPY config /home/user
 RUN chown -R user:user /home/user
-
-#WORKDIR /tmp
-#RUN wget https://github.com/atom/atom/releases/download/v1.48.0/atom-amd64.deb
-#RUN apt-get -y install gvfs-bin
-#RUN dpkg -i atom-amd64.deb
-RUN apt-get -y install gedit vim
 USER root
 
 WORKDIR /.novnc
@@ -34,6 +29,17 @@ RUN mkdir /.novnc/utils/websockify
 RUN wget -qO- https://github.com/novnc/websockify/archive/v0.6.1.tar.gz | tar xz --strip 1 -C /.novnc/utils/websockify
 RUN ln -s vnc.html index.html
 
+USER 0
+ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=dummy
+RUN dpkg --add-architecture i386
+RUN apt-get update
+RUN wget -qO - https://dl.winehq.org/wine-builds/winehq.key | apt-key add -
+RUN apt-get install -y software-properties-common
+RUN apt-add-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ bionic main'
+RUN apt-get update
+RUN apt-get install -y --install-recommends winehq-stable
+
+USER root
 WORKDIR /home/user
 
 CMD ["sh","/start.sh"]
